@@ -1,0 +1,102 @@
+.drivingStats {
+  background-color: var(--secondary-bg);
+  padding: 1rem;
+  border-radius: 5px;
+  max-width: 80%;
+  color: white;
+}
+
+.drivingStat {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.drivingStat h2 {
+  grid-row: 1;
+  grid-column: span 3;
+  font-size: 1rem;
+  padding: 0;
+}
+
+.drivingStat:last-of-type h2 {
+  color: #00a100;
+}
+
+.drivingStat div {
+  grid-row: 2;
+}
+
+.drivingStat div p,
+.diskUsage .disk h4,
+.diskUsage .disk p,
+.shortcuts p {
+  margin: 0;
+  padding: 0;
+}
+
+.drivingStat div p:first-of-type {
+  font-size: 1.5em;
+}
+
+.diskUsage {
+  width: calc(80% + 2rem);
+}
+
+.diskUsage h2,
+.diskUsage h4,
+.diskUsage p {
+  color: white;
+}
+
+.diskUsage h2,
+.diskUsage h4 {
+  font-size: 1rem;
+}
+
+.diskUsage p {
+  font-size: 0.8rem;
+}
+
+.disk {
+  background-color: var(--secondary-bg);
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+.disk .progress {
+  background-color: var(--main-bg);
+  height: 20px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.disk .bar {
+  background-color: #00a100;
+  height: 100%;
+  border-radius: 5px;
+}
+
+.shortcuts {
+  width: calc(80% + 2rem);
+}
+
+.shortcuts .searchBar,
+.shortcuts .searchBar .searchfield {
+  width: calc(100% - 1rem);
+}
+
+.shortcuts .shortcutLink {
+  background-color: var(--secondary-bg);
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 1rem;
+  border: 1px solid #504e4e;
+  border-radius: 10px;
+  width: calc(100% - 2rem);
+  text-decoration: none;
+  color: white;
+}

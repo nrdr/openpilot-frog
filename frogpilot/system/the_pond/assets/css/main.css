@@ -1,0 +1,168 @@
+:root {
+  --main-bg: #0b1b0b;
+  --main-fg: #178643;
+  --secondary-bg: #264026;
+  --sidebar-bg: #264026;
+  --sidebar-fg: #ffffff;
+  --sidebar-border-color: #1e2e1e;
+  --sidebar-active-bg: #64c87826;
+  --card-bg: #234423;
+  --track-color: #1a3a1a;
+  --thumb-color: #178643;
+  --selected-camera-bg: #1f2f1f;
+  --switch-inactive-bg: #3a3f37;
+}
+
+html,
+body,
+h1,
+h2,
+h3,
+.open-sans-regular {
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-weight: 600;
+}
+
+html,
+body {
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: var(--main-bg);
+}
+
+body {
+  padding-bottom: 2rem !important;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  padding: 1rem 0 10px;
+  color: white;
+}
+
+ul,
+li,
+a {
+  display: block;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+hr {
+  height: 1px;
+  border: none;
+  background-color: var(--sidebar-border-color);
+}
+
+.no_scroll {
+  overflow: hidden;
+}
+
+.hidden {
+  display: none;
+}
+
+.not_implemented {
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.content {
+  padding-left: 1.5rem;
+  flex-grow: 1;
+  color: var(--main-fg);
+  overflow-y: auto;
+  margin-left: 250px;
+}
+
+@media only screen and (max-width: 768px) {
+  .content {
+    margin-left: 0;
+  }
+}
+
+#snackbar_wrapper {
+  position: fixed;
+  bottom: 30px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: min(300px, 70%);
+  z-index: 10;
+}
+
+.snackbar {
+  visibility: hidden;
+  margin-bottom: 1rem;
+  background-color: var(--sidebar-bg);
+  color: var(--main-fg);
+  text-align: center;
+  border-radius: 5px;
+  padding: 16px;
+  transition: 1s;
+}
+
+.snackbar.show {
+  visibility: visible;
+  animation: fadein 0.5s;
+}
+
+@-webkit-keyframes fadein {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 30px;
+    opacity: 1;
+  }
+}
+
+@keyframes fadein {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 30px;
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeout {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+a.button {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  background-color: var(--sidebar-active-bg);
+  color: var(--main-fg);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}

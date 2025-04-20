@@ -1,0 +1,131 @@
+.route_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 40px 20px;
+  margin: 20px 0;
+}
+
+.route_card {
+  width: 300px;
+  background-color: var(--card-bg);
+  border-radius: 5px;
+  border: 1px solid var(--sidebar-border-color);
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--main-fg);
+}
+
+.route_card p {
+  padding: 1rem;
+}
+
+.route_preview {
+  position: relative;
+  width: 300px;
+  height: calc(300px * 0.625);
+}
+
+.route_preview img {
+  position: absolute;
+  display: inline-block;
+  width: 300px;
+  height: calc(300px * 0.625);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.image_preview:hover {
+  opacity: 0;
+}
+
+.camera_selector {
+  display: inline-flex;
+  margin: 1rem 0;
+  background-color: var(--sidebar-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: calc(100% - 1.5rem);
+}
+
+.camera_selector > div {
+  padding: 0 1rem;
+  cursor: pointer;
+}
+
+.camera_selector .selected_camera {
+  background-color: var(--selected-camera-bg);
+}
+
+.camera_selector .unavailable {
+  cursor: not-allowed;
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.camera_selector > div:first-child {
+  border-right: 1px solid var(--sidebar-border-color);
+}
+
+.camera_selector > div:last-child {
+  border-left: 1px solid var(--sidebar-border-color);
+}
+
+#duration {
+  opacity: 0.5;
+}
+
+.video_wrapper {
+  width: min(526px, calc(100% - 1.5rem));
+  background-color: var(--sidebar-bg);
+  border-radius: 10px 10px;
+}
+
+video {
+  border-radius: 10px 10px 0 0;
+  width: min(526px, 100%);
+  height: calc(min(526px, calc(100% - 1.5rem)) * 0.625 - 1px);
+}
+
+.videocontrols {
+  display: flex;
+  gap: 0.6rem;
+  background-color: var(--sidebar-bg);
+  border-radius: 10px;
+}
+
+.videocontrols p {
+  margin: 0;
+}
+
+.videocontrols #seekslider {
+  flex-grow: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.videocontrols #seekslider::-webkit-slider-runnable-track,
+.videocontrols #seekslider::-moz-range-track {
+  background: var(--track-color);
+  height: 0.25rem;
+  border-radius: 5px;
+}
+
+.videocontrols #seekslider::-webkit-slider-thumb,
+.videocontrols #seekslider::-moz-range-thumb {
+  border: none;
+  border-radius: 1rem;
+  background-color: var(--thumb-color);
+  height: 1rem;
+  width: 1rem;
+  margin-top: calc(0.125rem - 0.5rem);
+}
+
+.videocontrols button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: var(--main-fg);
+}
