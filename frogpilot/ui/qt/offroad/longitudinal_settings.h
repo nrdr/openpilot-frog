@@ -38,7 +38,7 @@ private:
 
   std::set<QString> aggressivePersonalityKeys = {"AggressiveFollow", "AggressiveJerkAcceleration", "AggressiveJerkDeceleration", "AggressiveJerkDanger", "AggressiveJerkSpeed", "AggressiveJerkSpeedDecrease", "ResetAggressivePersonality"};
   std::set<QString> conditionalExperimentalKeys = {"CESpeed", "CESpeedLead", "CECurves", "CELead", "CEModelStopTime", "CENavigation", "CESignalSpeed", "ShowCEMStatus"};
-  std::set<QString> curveSpeedKeys = {"CurveDetectionMethod", "CurveSensitivity", "MTSCCurvatureCheck", "ShowCSCStatus", "TurnAggressiveness"};
+  std::set<QString> curveSpeedKeys = {"CalibrationProgress", "ResetCurveData", "ShowCSCStatus"};
   std::set<QString> customDrivingPersonalityKeys = {"AggressivePersonalityProfile", "RelaxedPersonalityProfile", "StandardPersonalityProfile", "TrafficPersonalityProfile"};
   std::set<QString> longitudinalTuneKeys = {"AccelerationProfile", "DecelerationProfile", "HumanAcceleration", "HumanFollowing", "LeadDetectionThreshold", "MaxDesiredAcceleration", "TacoTune"};
   std::set<QString> qolKeys = {"CustomCruise", "CustomCruiseLong", "ForceStandstill", "ForceStops", "IncreasedStoppedDistance", "MapGears", "ReverseCruise", "SetSpeedOffset"};
@@ -54,9 +54,9 @@ private:
 
   FrogPilotButtonControl *updateSpeedLimitsToggle;
 
-  FrogPilotButtonsControl *curveDetectionToggle;
-
   FrogPilotSettingsWindow *parent;
+
+  LabelControl *calibrationProgressLabel;
 
   QJsonObject frogpilotToggleLevels;
 

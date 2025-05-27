@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import json
-import math
 import numpy as np
 import random
 
@@ -30,10 +29,11 @@ SafetyModel = car.CarParams.SafetyModel
 
 CITY_SPEED_LIMIT = 25                     # 55mph is typically the minimum speed for highways
 CRUISING_SPEED = 5                        # Roughly the speed cars go when not touching the gas while in drive
+DEFAULT_LATERAL_ACCELERATION = 2.0        # m/s^2, typical lateral acceleration for safe cornering in urban driving
 EARTH_RADIUS = 6378137                    # Radius of the Earth in meters
+MINIMUM_LATERAL_ACCELERATION = 1.3
 PLANNER_TIME = ModelConstants.T_IDXS[-1]  # Length of time the model projects out for
 THRESHOLD = 0.63                          # Requires the condition to be true for ~1 second
-TO_RADIANS = math.pi / 180                # Conversion factor from degrees to radians
 
 ACTIVE_THEME_PATH = Path(__file__).parents[1] / "assets/active_theme"
 METADATAS_PATH = Path(__file__).parents[1] / "assets/model_metadata"
@@ -102,6 +102,7 @@ frogpilot_default_params: list[tuple[str, str | bytes, int]] = [
   ("BlindSpotMetrics", "1", 3),
   ("BlindSpotPath", "1", 1),
   ("BorderMetrics", "0", 3),
+  ("CalibrationProgress", "0", 1),
   ("CameraView", "3", 2),
   ("CarMake", "", 0),
   ("CarModel", "", 0),
@@ -110,7 +111,7 @@ frogpilot_default_params: list[tuple[str, str | bytes, int]] = [
   ("CECurves", "1", 1),
   ("CECurvesLead", "0", 1),
   ("CELead", "0", 1),
-  ("CEModelStopTime", "8", 2),
+  ("CEModelStopTime", str(PLANNER_TIME - 2), 2),
   ("CENavigation", "1", 2),
   ("CENavigationIntersections", "1", 2),
   ("CENavigationLead", "1", 2),
@@ -124,8 +125,7 @@ frogpilot_default_params: list[tuple[str, str | bytes, int]] = [
   ("ClusterOffset", "1.015", 2),
   ("Compass", "0", 1),
   ("ConditionalExperimental", "1", 0),
-  ("CurveSensitivity", "100", 2),
-  ("CurveSpeedControl", "1", 1),
+  ("CurveSpeedController", "1", 1),
   ("CustomAlerts", "1", 0),
   ("CustomColors", "frog", 0),
   ("CustomCruise", "1", 2),
@@ -219,7 +219,6 @@ frogpilot_default_params: list[tuple[str, str | bytes, int]] = [
   ("MapGears", "0", 1),
   ("MapsSelected", "", 0),
   ("MapStyle", "0", 2),
-  ("MapTurnControl", "1", 1),
   ("MaxDesiredAcceleration", "4.0", 3),
   ("MinimumLaneChangeSpeed", str(LANE_CHANGE_SPEED_MIN / CV.MPH_TO_MS), 2),
   ("Model", DEFAULT_CLASSIC_MODEL, 1),
@@ -228,7 +227,6 @@ frogpilot_default_params: list[tuple[str, str | bytes, int]] = [
   ("ModelUI", "1", 2),
   ("ModelVersion", DEFAULT_CLASSIC_MODEL_VERSION, 2),
   ("ModelVersions", "", 2),
-  ("MTSCCurvatureCheck", "1", 2),
   ("NavigationUI", "1", 1),
   ("NavSettingLeftSide", "0", 0),
   ("NavSettingTime24h", "0", 0),
@@ -358,16 +356,15 @@ frogpilot_default_params: list[tuple[str, str | bytes, int]] = [
   ("TrafficPersonalityProfile", "1", 2),
   ("TuningLevel", "0", 0),
   ("TuningLevelConfirmed", "0", 0),
-  ("TurnAggressiveness", "100", 2),
   ("TurnDesires", "0", 2),
   ("UnlimitedLength", "1", 2),
   ("UnlockDoors", "1", 0),
   ("UpdaterAvailableBranches", "", 0),
   ("UseKonikServer", "0", 2),
+  ("UserLateralAcceleration", "", 1),
   ("UseSI", "1", 3),
   ("UseVienna", "0", 1),
   ("VeryLongDistanceButtonControl", "6", 2),
-  ("VisionTurnControl", "1", 1),
   ("VoltSNG", "0", 2),
   ("WarningImmediateVolume", "101", 2),
   ("WarningSoftVolume", "101", 2),
@@ -552,12 +549,7 @@ class FrogPilotVariables:
     toggle.conditional_signal_lane_detection = toggle.conditional_signal != 0 and (params.get_bool("CESignalLaneDetection") if tuning_level >= level["CESignalLaneDetection"] else default.get_bool("CESignalLaneDetection"))
     toggle.cem_status = toggle.conditional_experimental_mode and (params.get_bool("ShowCEMStatus") if tuning_level >= level["ShowCEMStatus"] else default.get_bool("ShowCEMStatus")) or toggle.debug_mode
 
-    toggle.curve_speed_controller = openpilot_longitudinal and (params.get_bool("CurveSpeedControl") if tuning_level >= level["CurveSpeedControl"] else default.get_bool("CurveSpeedControl"))
-    toggle.curve_sensitivity = params.get_int("CurveSensitivity") / 100 if toggle.curve_speed_controller and tuning_level >= level["CurveSensitivity"] else default.get_int("CurveSensitivity") / 100
-    toggle.turn_aggressiveness = params.get_int("TurnAggressiveness") / 100 if toggle.curve_speed_controller and tuning_level >= level["TurnAggressiveness"] else default.get_int("TurnAggressiveness") / 100
-    toggle.map_turn_speed_controller = toggle.curve_speed_controller and (params.get_bool("MapTurnControl") if tuning_level >= level["MapTurnControl"] else default.get_bool("MapTurnControl"))
-    toggle.mtsc_curvature_check = toggle.map_turn_speed_controller and (params.get_bool("MTSCCurvatureCheck") if tuning_level >= level["MTSCCurvatureCheck"] else default.get_bool("MTSCCurvatureCheck"))
-    toggle.vision_turn_speed_controller = toggle.curve_speed_controller and (params.get_bool("VisionTurnControl") if tuning_level >= level["VisionTurnControl"] else default.get_bool("VisionTurnControl"))
+    toggle.curve_speed_controller = openpilot_longitudinal and (params.get_bool("CurveSpeedController") if tuning_level >= level["CurveSpeedController"] else default.get_bool("CurveSpeedController"))
     toggle.csc_status = toggle.curve_speed_controller and (params.get_bool("ShowCSCStatus") if tuning_level >= level["ShowCSCStatus"] else default.get_bool("ShowCSCStatus")) or toggle.debug_mode
 
     toggle.custom_alerts = params.get_bool("CustomAlerts") if tuning_level >= level["CustomAlerts"] else default.get_bool("CustomAlerts")

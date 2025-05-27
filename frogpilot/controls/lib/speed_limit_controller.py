@@ -16,7 +16,7 @@ from openpilot.common.realtime import DT_MDL
 from openpilot.common.time import system_time_valid
 
 from openpilot.frogpilot.common.frogpilot_utilities import calculate_bearing_offset, calculate_distance_to_point, is_url_pingable
-from openpilot.frogpilot.common.frogpilot_variables import TO_RADIANS, params, params_cache, params_memory
+from openpilot.frogpilot.common.frogpilot_variables import params, params_cache, params_memory
 
 FREE_MAPBOX_REQUESTS = 100_000
 
@@ -327,7 +327,7 @@ class SpeedLimitController:
       next_latitude = next_map_speed_limit.get("latitude")
       next_longitude = next_map_speed_limit.get("longitude")
 
-      distance_to_upcoming = calculate_distance_to_point(current_latitude * TO_RADIANS, current_longitude * TO_RADIANS, next_latitude * TO_RADIANS, next_longitude * TO_RADIANS)
+      distance_to_upcoming = calculate_distance_to_point(current_latitude * CV.DEG_TO_RAD, current_longitude * CV.DEG_TO_RAD, next_latitude * CV.DEG_TO_RAD, next_longitude * CV.DEG_TO_RAD)
 
       if self.map_speed_limit < self.next_speed_limit:
         max_lookahead = self.frogpilot_toggles.map_speed_lookahead_higher * v_ego

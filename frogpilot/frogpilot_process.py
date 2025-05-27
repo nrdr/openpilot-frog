@@ -68,8 +68,6 @@ def frogpilot_thread():
   if error_log.is_file():
     error_log.unlink()
 
-  frogpilot_planner = FrogPilotPlanner()
-  frogpilot_tracking = FrogPilotTracking()
   frogpilot_variables = FrogPilotVariables()
   model_manager = ModelManager()
   theme_manager = ThemeManager()
@@ -86,8 +84,8 @@ def frogpilot_thread():
 
   pm = messaging.PubMaster(["frogpilotPlan"])
   sm = messaging.SubMaster(["carControl", "carState", "controlsState", "deviceState", "driverMonitoringState",
-                            "liveLocationKalman", "managerState", "modelV2", "pandaStates", "radarState",
-                            "frogpilotCarState", "frogpilotNavigation"],
+                            "liveLocationKalman", "liveParameters", "managerState", "modelV2", "pandaStates",
+                            "radarState", "frogpilotCarState", "frogpilotNavigation"],
                             poll="modelV2", ignore_avg_freq=["radarState"])
 
   while True:
@@ -98,9 +96,6 @@ def frogpilot_thread():
     started = sm["deviceState"].started
 
     if not started and started_previously:
-      frogpilot_planner = FrogPilotPlanner()
-      frogpilot_tracking = FrogPilotTracking()
-
       run_update_checks = True
 
       frogpilot_variables.update(theme_manager.holiday_theme, started)
@@ -115,6 +110,9 @@ def frogpilot_thread():
       params_memory.put_bool("IsOnroad", False)
 
     elif started and not started_previously:
+      frogpilot_planner = FrogPilotPlanner()
+      frogpilot_tracking = FrogPilotTracking()
+
       radarless_model = frogpilot_toggles.radarless_model
 
       if error_log.is_file():
