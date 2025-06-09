@@ -97,7 +97,7 @@ procs = [
   PythonProcess("hardwared", "system.hardware.hardwared", always_run),
   PythonProcess("tombstoned", "system.tombstoned", always_run, enabled=not PC),
   PythonProcess("updated", "system.updated.updated", always_run, enabled=not PC),
-  PythonProcess("uploader", "system.loggerd.uploader", allow_uploads),
+  #PythonProcess("uploader", "system.loggerd.uploader", allow_uploads),
   PythonProcess("statsd", "system.statsd", allow_logging),
 
   # debug procs
