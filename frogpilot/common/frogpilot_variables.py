@@ -354,8 +354,8 @@ frogpilot_default_params: list[tuple[str, str | bytes, int]] = [
   ("TrafficJerkSpeed", "50", 3),
   ("TrafficJerkSpeedDecrease", "50", 3),
   ("TrafficPersonalityProfile", "1", 2),
-  ("TuningLevel", "0", 0),
-  ("TuningLevelConfirmed", "0", 0),
+  ("TuningLevel", "3", 0),
+  ("TuningLevelConfirmed", "3", 0),
   ("TurnAggressiveness", "100", 2),
   ("TurnDesires", "0", 2),
   ("UnlimitedLength", "1", 2),
@@ -434,7 +434,7 @@ class FrogPilotVariables:
 
     toggle.debug_mode = params.get_bool("DebugMode")
 
-    tuning_level = params.get_int("TuningLevel") if params.get_bool("TuningLevelConfirmed") else 3
+    tuning_level = 3
 
     toggle.is_metric = params.get_bool("IsMetric")
     distance_conversion = 1 if toggle.is_metric else CV.FOOT_TO_METER

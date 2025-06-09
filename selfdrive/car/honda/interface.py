@@ -97,11 +97,24 @@ class CarInterface(CarInterfaceBase):
         # stock filter output values:     0x009F, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108
         # modified filter output values:  0x009F, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0400, 0x0480
         # note: max request allowed is 4096, but request is capped at 3840 in firmware, so modifications result in 2x max
-        ret.lateralParams.torqueBP, ret.lateralParams.torqueV = [[0, 2560, 8000], [0, 2560, 3840]]
-        ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.3], [0.1]]
+        # ret.lateralParams.torqueBP =  [0x0, 0x917, 0xDC5, 0x1017, 0x119F, 0x140B, 0x1680, 0x57C0, 0x6300] (hexdecimal)
+        # ret.lateralParams.torqueV =   [0x0, 0x200, 0x300, 0x478, 0x5EC, 0x800, 0xA00, 0xE00, 0xF00] (hexdecimal)
+        # ret.lateralParams.torqueBP = [0, 2327, 3525, 4119, 4511, 5131, 5760, 22464, 25344]
+        # ret.lateralParams.torqueV = [0, 512, 768, 1144, 1516, 2048, 2560, 3584, 3840]
+        ret.lateralParams.torqueBP = [0, 2880, 5760, 8640, 11520, 14688, 17280, 20160, 23040]
+        ret.lateralParams.torqueV  = [0, 480, 960, 1440, 1920, 2448, 2880, 3360, 3840]
+        ret.lateralTuning.init('torque')
+        ret.lateralTuning.torque.useSteeringAngle = True
+        ret.lateralTuning.torque.kp = 1.0
+        ret.lateralTuning.torque.kf = 1.0
+        ret.lateralTuning.torque.ki = 0.1
+        ret.lateralTuning.torque.friction = 0.45
+        ret.lateralTuning.torque.latAccelFactor = 3.6
       else:
-        ret.lateralParams.torqueBP, ret.lateralParams.torqueV = [[0, 2560], [0, 2560]]
-        ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[1.1], [0.33]]
+        ret.lateralTuning.pid.kf = 0.00006  # Default feed-forward
+        ret.lateralParams.torqueBP = [0, 2560] # Stock Honda EPS Firmware
+        ret.lateralParams.torqueV = [0, 2560] # Stock Honda EPS Firmware
+        ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[1.1], [0.33]] # Stock Honda EPS Firmware
 
     elif candidate in (CAR.HONDA_CIVIC_BOSCH, CAR.HONDA_CIVIC_BOSCH_DIESEL, CAR.HONDA_CIVIC_2022):
       if eps_modified:
