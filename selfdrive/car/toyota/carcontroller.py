@@ -16,6 +16,7 @@ from openpilot.selfdrive.controls.lib.drive_helpers import CRUISE_LONG_PRESS
 from openpilot.selfdrive.controls.lib.pid import PIDController
 from opendbc.can.packer import CANPacker
 
+from openpilot.frogpilot.common.frogpilot_variables import CITY_SPEED_LIMIT
 from openpilot.frogpilot.controls.lib.frogpilot_acceleration import get_max_allowed_accel
 
 GearShifter = car.CarState.GearShifter
@@ -92,20 +93,23 @@ class CarController(CarControllerBase):
     self.secoc_key: bytes = b"00" * 16
 
     # FrogPilot variables
-    self.stock_max_accel = self.params.ACCEL_MAX
-
     self.doors_locked = False
     self.reverse_cruise_active = False
 
     self.cruise_timer = 0
     self.previous_set_speed = 0
 
+    self.stock_k_f = self.long_pid.k_f
+    self.stock_max_accel = self.params.ACCEL_MAX
+
   def update(self, CC, CS, now_nanos, frogpilot_toggles):
     if frogpilot_toggles.sport_plus and (CS.out.gearShifter == GearShifter.sport or not frogpilot_toggles.map_acceleration):
       self.params.ACCEL_MAX = min(frogpilot_toggles.max_desired_acceleration, get_max_allowed_accel(CS.out.vEgo))
+      self.long_pid.k_f = interp(CS.out.vEgo, [0.0, CITY_SPEED_LIMIT], [1.0, 0.9])
       self.long_pid.pos_limit = self.params.ACCEL_MAX
     else:
       self.params.ACCEL_MAX = min(frogpilot_toggles.max_desired_acceleration, self.stock_max_accel)
+      self.long_pid.k_f = self.stock_k_f
       self.long_pid.pos_limit = self.params.ACCEL_MAX
 
     actuators = CC.actuators
