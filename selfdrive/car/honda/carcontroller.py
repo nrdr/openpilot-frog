@@ -99,12 +99,13 @@ HUDData = namedtuple("HUDData",
                      ["pcm_accel", "v_cruise", "lead_visible",
                       "lanes_visible", "fcw", "acc_alert", "steer_required", "lead_distance_bars"])
 
-
 def rate_limit_steer(new_steer, last_steer):
-  # TODO just hardcoded ramp to min/max in 0.33s for all Honda
-  MAX_DELTA = 3 * DT_CTRL
-  return clip(new_steer, last_steer - MAX_DELTA, last_steer + MAX_DELTA)
+  # Speed params can be adjusted if needed
+  base_tau = 0.2  # Time constant in seconds
+  alpha = DT_CTRL / (base_tau + DT_CTRL)  # Alpha for first-order low-pass
 
+  # Simple low-pass filter
+  return alpha * new_steer + (1 - alpha) * last_steer
 
 class CarController(CarControllerBase):
   def __init__(self, dbc_name, CP, FPCP, VM):
@@ -131,7 +132,7 @@ class CarController(CarControllerBase):
     actuators = CC.actuators
     hud_control = CC.hudControl
     conversion = hondacan.get_cruise_speed_conversion(self.CP.carFingerprint, CS.is_metric)
-    hud_v_cruise = hud_control.setSpeed / conversion if hud_control.speedVisible else 255
+    hud_v_cruise = 255
     pcm_cancel_cmd = CC.cruiseControl.cancel
 
     if CC.longActive:
@@ -237,12 +238,19 @@ class CarController(CarControllerBase):
           self.brake = apply_brake / self.params.NIDEC_BRAKE_MAX
 
           if self.CP.enableGasInterceptor:
-            # way too aggressive at low speed without this
-            gas_mult = interp(CS.out.vEgo, [0., 10.], [0.4, 1.0])
-            # send exactly zero if apply_gas is zero. Interceptor will send the max between read value and apply_gas.
-            # This prevents unexpected pedal range rescaling
-            # Sending non-zero gas when OP is not enabled will cause the PCM not to respond to throttle as expected
-            # when you do enable.
+            # Non-hardcoded approaches to this conditional statement require an import of CAR from openpilot.selfdrive.car.honda.values or a creation
+            # of a new flag in openpilot.selfdrive.car.honda.values and an import of that flag. Since this is a Clarity-specific tune, a hardcode seems
+            # reasonable here. If in the future, CAR is imported, this statement can check against CAR.HONDA_CLARITY instead of the current string value
+            if self.CP.carFingerprint == "HONDA_CLARITY":
+              # mike8643 Clarity Long Tune Interpolation
+              gas_mult = 1
+            else:
+              # way too aggressive at low speed without this
+              gas_mult = 1
+              # send exactly zero if apply_gas is zero. Interceptor will send the max between read value and apply_gas.
+              # This prevents unexpected pedal range rescaling
+              # Sending non-zero gas when OP is not enabled will cause the PCM not to respond to throttle as expected
+              # when you do enable.
             if CC.longActive:
               self.gas = clip(gas_mult * (gas - brake + wind_brake * 3 / 4), 0., 1.)
             else:
