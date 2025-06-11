@@ -781,7 +781,6 @@ class FrogPilotVariables:
       toggle.model_version = DEFAULT_CLASSIC_MODEL_VERSION
     toggle.classic_model = toggle.model_version in {"v1", "v2", "v3", "v4"}
     toggle.planner_curvature_model = toggle.model_version not in {"v1", "v2", "v3", "v4", "v5"}
-    toggle.radarless_model = toggle.model_version in {"v3"}
     toggle.tinygrad_model = toggle.model_version in {"v7"}
 
     toggle.model_ui = params.get_bool("ModelUI") if tuning_level >= level["ModelUI"] else default.get_bool("ModelUI")

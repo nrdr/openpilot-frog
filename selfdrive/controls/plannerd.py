@@ -38,12 +38,11 @@ def plannerd_thread():
   frogpilot_toggles = get_frogpilot_toggles()
 
   classic_model = frogpilot_toggles.classic_model
-  radarless_model = frogpilot_toggles.radarless_model
 
   while True:
     sm.update()
     if sm.updated['modelV2']:
-      longitudinal_planner.update(radarless_model, sm, frogpilot_toggles)
+      longitudinal_planner.update(sm, frogpilot_toggles)
       longitudinal_planner.publish(classic_model, sm, pm, frogpilot_toggles)
       publish_ui_plan(sm, pm, longitudinal_planner)
 

@@ -113,15 +113,13 @@ def frogpilot_thread():
       frogpilot_planner = FrogPilotPlanner()
       frogpilot_tracking = FrogPilotTracking()
 
-      radarless_model = frogpilot_toggles.radarless_model
-
       if error_log.is_file():
         error_log.unlink()
 
       params_memory.put_bool("IsOnroad", True)
 
     if started and sm.updated["modelV2"]:
-      frogpilot_planner.update(radarless_model, sm, frogpilot_toggles)
+      frogpilot_planner.update(sm, frogpilot_toggles)
       frogpilot_planner.publish(sm, pm, theme_manager.theme_updated, toggles_updated)
 
       frogpilot_tracking.update(sm)

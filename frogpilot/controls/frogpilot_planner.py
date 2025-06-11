@@ -11,7 +11,6 @@ from openpilot.common.realtime import DT_MDL
 
 from openpilot.selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX
 from openpilot.selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import A_CHANGE_COST, DANGER_ZONE_COST, J_EGO_COST, STOP_DISTANCE
-from openpilot.selfdrive.controls.lib.longitudinal_planner import Lead
 
 from openpilot.frogpilot.common.frogpilot_utilities import calculate_lane_width, calculate_road_curvature
 from openpilot.frogpilot.common.frogpilot_variables import CRUISING_SPEED, MINIMUM_LATERAL_ACCELERATION, PLANNER_TIME, THRESHOLD, params, params_memory
@@ -28,7 +27,6 @@ class FrogPilotPlanner:
     self.frogpilot_events = FrogPilotEvents(self)
     self.frogpilot_following = FrogPilotFollowing(self)
     self.frogpilot_vcruise = FrogPilotVCruise(self)
-    self.lead_one = Lead()
 
     with car.CarParams.from_bytes(params.get("CarParams", block=True)) as msg:
       self.CP = msg
@@ -50,17 +48,8 @@ class FrogPilotPlanner:
     self.time_to_curve = 0
     self.v_cruise = 0
 
-  def update(self, radarless_model, sm, frogpilot_toggles):
-    if radarless_model:
-      model_leads = list(sm["modelV2"].leadsV3)
-      if len(model_leads) > 0:
-        distance_offset = frogpilot_toggles.increased_stopped_distance if not sm["frogpilotCarState"].trafficModeEnabled else 0
-        model_lead = model_leads[0]
-        self.lead_one.update(model_lead.x[0] - distance_offset, model_lead.y[0], model_lead.v[0], model_lead.a[0], model_lead.prob)
-      else:
-        self.lead_one.reset()
-    else:
-      self.lead_one = sm["radarState"].leadOne
+  def update(self, sm, frogpilot_toggles):
+    self.lead_one = sm["radarState"].leadOne
 
     v_cruise_kph = min(max(sm["controlsState"].vCruise, sm["controlsState"].vCruiseCluster), V_CRUISE_MAX)
     v_cruise = v_cruise_kph * CV.KPH_TO_MS
