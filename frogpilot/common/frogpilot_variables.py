@@ -3,10 +3,12 @@ import json
 import numpy as np
 import random
 
+from functools import cache
 from pathlib import Path
 from types import SimpleNamespace
 
 from cereal import car, log
+from openpilot.common.basedir import BASEDIR
 from openpilot.common.conversions import Conversions as CV
 from openpilot.common.params import Params
 from openpilot.selfdrive.car.gm.values import GMFlags
@@ -49,6 +51,9 @@ KONIK_LOGS_PATH = Path("/data/media/0/realdata_konik")
 MAPD_PATH = Path("/data/media/0/osm/mapd")
 MAPS_PATH = Path("/data/media/0/osm/offline")
 
+NEURAL_PARAMS_PATH = Path(BASEDIR) / "selfdrive/car/torque_data/neural_ff_weights.json"
+TORQUE_NN_MODEL_PATH = Path(BASEDIR) / "selfdrive/car/torque_data/lat_models"
+
 DEFAULT_CLASSIC_MODEL = "wd-40"
 DEFAULT_CLASSIC_MODEL_NAME = "WD-40 (Default) 👀📡"
 DEFAULT_CLASSIC_MODEL_VERSION = "v2"
@@ -66,6 +71,26 @@ EXCLUDED_KEYS = {
   "ExperimentalModels", "KonikMinutes", "MapBoxRequests", "ModelDrivesAndScores", "ModelVersions",
   "openpilotMinutes", "OverpassRequests", "SpeedLimits", "SpeedLimitsFiltered", "UpdaterAvailableBranches"
 }
+
+@cache
+def get_comma_nnff_model_file():
+  with open(NEURAL_PARAMS_PATH, "r") as file:
+    return json.load(file)
+
+def comma_nnff_supported(car):
+  return car in get_comma_nnff_model_file()
+
+@cache
+def get_nnff_model_files():
+  model_dir = Path(TORQUE_NN_MODEL_PATH)
+  return [file.stem for file in model_dir.iterdir() if file.is_file()]
+
+def nnff_supported(car_fingerprint):
+  for file in get_nnff_model_files():
+    if file.startswith(car_fingerprint):
+      return True
+
+  return False
 
 def get_frogpilot_toggles(block=True):
   return SimpleNamespace(**json.loads(params_memory.get("FrogPilotToggles", block=block) or "{}"))
@@ -442,6 +467,7 @@ class FrogPilotVariables:
         has_auto_tune = car_make in {"hyundai", "toyota"} and CP.lateralTuning.which() == "torque"
         has_bsm = CP.enableBsm
         toggle.has_cc_long = bool(CP.flags & GMFlags.CC_LONG.value)
+        has_nnff = not comma_nnff_supported(car_model) and nnff_supported(car_model) and car_make != "honda"
         has_pedal = CP.enableGasInterceptor
         has_radar = not CP.radarUnavailable
         is_torque_car = CP.lateralTuning.which() == "torque"
@@ -460,6 +486,7 @@ class FrogPilotVariables:
       has_auto_tune = False
       has_bsm = False
       toggle.has_cc_long = False
+      has_nnff = False
       has_pedal = False
       has_radar = False
       is_torque_car = False
@@ -695,8 +722,8 @@ class FrogPilotVariables:
     toggle.one_lane_change = lane_change_customizations and (params.get_bool("OneLaneChange") if tuning_level >= level["OneLaneChange"] else default.get_bool("OneLaneChange"))
 
     lateral_tuning = params.get_bool("LateralTune") if tuning_level >= level["LateralTune"] else default.get_bool("LateralTune")
-    toggle.nnff = lateral_tuning and (params.get_bool("NNFF") if tuning_level >= level["NNFF"] else default.get_bool("NNFF")) and car_make != "honda"
-    toggle.nnff_lite = lateral_tuning and (params.get_bool("NNFFLite") if tuning_level >= level["NNFFLite"] else default.get_bool("NNFFLite")) and car_make != "honda"
+    toggle.nnff = lateral_tuning and has_nnff and (params.get_bool("NNFF") if tuning_level >= level["NNFF"] else default.get_bool("NNFF"))
+    toggle.nnff_lite = not toggle.nnff and lateral_tuning and (params.get_bool("NNFFLite") if tuning_level >= level["NNFFLite"] else default.get_bool("NNFFLite"))
     toggle.use_turn_desires = lateral_tuning and (params.get_bool("TurnDesires") if tuning_level >= level["TurnDesires"] else default.get_bool("TurnDesires"))
 
     lkas_button_control = (params.get_int("LKASButtonControl") if tuning_level >= level["LKASButtonControl"] else default.get_int("LKASButtonControl")) if car_make != "subaru" else 0
