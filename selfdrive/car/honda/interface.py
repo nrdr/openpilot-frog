@@ -101,10 +101,15 @@ class CarInterface(CarInterfaceBase):
         # ret.lateralParams.torqueV =   [0x0, 0x200, 0x300, 0x478, 0x5EC, 0x800, 0xA00, 0xE00, 0xF00] (hexdecimal)
         # ret.lateralParams.torqueBP = [0, 2327, 3525, 4119, 4511, 5131, 5760, 22464, 25344]
         # ret.lateralParams.torqueV = [0, 512, 768, 1144, 1516, 2048, 2560, 3584, 3840]
-        ret.lateralParams.torqueBP = [0x0, 0x917, 0xDC5, 0x1017, 0x119F, 0x140B, 0x1680, 0x69EF, 0x752F]
-        ret.lateralParams.torqueV  = [0x0, 0x200, 0x300, 0x478, 0x5EC, 0x800, 0xA00, 0xE00, 0xF00]
-        ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kpV = [[0, 10], [0.02750, 0.2750]]
-        ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kiV = [[0, 10], [0.00825, 0.0825]]
+        ret.lateralParams.torqueBP = [0x0, 2560, 30000] # 29999 is the max known safe torque on this EPS. Beyond and the car commits insubordination and handles the commands weird
+        ret.lateralParams.torqueV  = [0x0, 2560, 3840]
+        ret.lateralTuning.init('torque')
+        ret.lateralTuning.torque.useSteeringAngle = True
+        ret.lateralTuning.torque.kp = 1.0
+        ret.lateralTuning.torque.kf = 1.0
+        ret.lateralTuning.torque.ki = 0.1
+        ret.lateralTuning.torque.friction = 0.25458812851328544
+        ret.lateralTuning.torque.latAccelFactor = 3.305779125557104
       else:
         ret.lateralTuning.pid.kf = 0.00006  # Default feed-forward
         ret.lateralParams.torqueBP = [0, 2560] # Stock Honda EPS Firmware
