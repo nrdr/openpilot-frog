@@ -57,7 +57,7 @@ class CarInterface(CarInterfaceBase):
     return torque + friction
 
   def torque_from_lateral_accel(self) -> TorqueFromLateralAccelCallbackType:
-    if self.CP.flags & HondaFlags.EPS_MODIFIED:
+    if not self.CP.flags & HondaFlags.EPS_MODIFIED:
       return self.torque_from_lateral_accel_modded
     else:
       return self.torque_from_lateral_accel_linear
