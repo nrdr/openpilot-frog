@@ -122,8 +122,8 @@ class CarInterface(CarInterfaceBase):
 
     if candidate == CAR.HONDA_CIVIC:
       if ret.flags & HondaFlags.EPS_MODIFIED:
-        ret.lateralParams.torqueV = [0, 3072, 6144, 9216, 14400, 18432, 21504, 24576, 28800]  # Actual EPS Values
-        ret.lateralParams.torqueBP = [0, 192, 512, 1024, 1920, 2560, 3072, 3584, 3840]
+        ret.lateralParams.torqueBP = [0, 3072, 6144, 9216, 14400, 18432, 21504, 24576, 28800]  # Actual EPS Values
+        ret.lateralParams.torqueV = [0, 192, 512, 1024, 1920, 2560, 3072, 3584, 3840]
         ret.lateralTuning.init('torque')
         ret.lateralTuning.torque.useSteeringAngle = True
         ret.lateralTuning.torque.kp = 1.0
