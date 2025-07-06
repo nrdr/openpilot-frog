@@ -124,8 +124,8 @@ class CarInterface(CarInterfaceBase):
       if ret.flags & HondaFlags.EPS_MODIFIED:
         ret.lateralParams.torqueBP = [0, 2560, 32757] # Stock Honda EPS Firmware
         ret.lateralParams.torqueV = [0, 2560, 3840] # Stock Honda EPS Firmware
-        ret.lateralTuning.pid.kf = 0.00003  # Modified feed-forward
-        ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15], [0.05]] # Modified Honda EPS Firmware
+        ret.lateralTuning.pid.kf = 0.0000237972824  # Modified feed-forward
+        ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.118986412], [0.0396621373]] # Modified Honda EPS Firmware
       else:
         ret.lateralTuning.pid.kf = 0.00006  # Default feed-forward
         ret.lateralParams.torqueBP = [0, 2560] # Stock Honda EPS Firmware
